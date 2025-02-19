@@ -1,7 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:untitled18/logic/now_playing/cubit.dart';
+import 'package:untitled18/logic/top_rated/cubit.dart';
 import 'package:untitled18/presentation/widgets/nowplaying_widget.dart';
 import 'package:untitled18/presentation/widgets/top_rated_widget.dart';
 
+import '../../logic/popular/cubit.dart';
 import '../widgets/popular_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -9,72 +14,58 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context)=> NowPlayingCubit(Dio())..getNowPlayingData()),
+        BlocProvider(create: (context)=> PopularCubit(Dio())..getPopularDate()),
+        BlocProvider(create: (context)=> TopRatedCubit(Dio())..getTopRatedData()),
 
-        children: [
-          SizedBox(
-            height: 370,
-            child: ListView.builder(
-              itemCount: 10,
-              scrollDirection: Axis.horizontal,
-
-              itemBuilder: (context, index)=> NowplayingWidget()
-
-                ),
+      ],
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+                
+            children: [
+              NowplayingWidget(),
+              SizedBox(
+                height: 16,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text("Popular on netflix",style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white
+                ),),
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              PopularWidget(),
+              SizedBox(
+                height: 16,
+              ),
+                
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text("Top Rated",style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white
+                ),),
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              TopRatedWidget(),
+                
+                
+            ],
           ),
-          SizedBox(
-            height: 16,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Text("Popular on netflix",style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white
-            ),),
-          ),
-          SizedBox(
-            height: 16,
-          ),
-
-          SizedBox(
-            height: 161,
-            child: ListView.builder(
-              itemCount: 10,
-                scrollDirection: Axis.horizontal,
-                itemBuilder:(context, index) => PopularWidget(),
-               ),
-          ),
-          SizedBox(
-            height: 16,
-          ),
-
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Text("Top Rated",style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white
-            ),),
-          ),
-          SizedBox(
-            height: 16,
-          ),
-
-          SizedBox(
-            height: 161,
-            child: ListView.builder(
-              itemCount: 10,
-              scrollDirection: Axis.horizontal,
-              itemBuilder:(context, index) => TopRatedWidget(),
-            ),
-          ),
-
-        ],
-      )
+        )
+      ),
     );
   }
 }
